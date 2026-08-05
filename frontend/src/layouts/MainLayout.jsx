@@ -1,9 +1,18 @@
-import Sidebar from "./sidebar";
+import Sidebar from "./Sidebar";
+import Topbar from "../components/Topbar";
 
 function MainLayout() {
   return (
-    <div>
+    <div className="flex h-screen">
       <Sidebar />
+
+      <div className="flex-1 flex flex-col">
+        <Topbar />
+
+        <main className="flex-1 bg-gray-100 p-6">
+          Main Content
+        </main>
+      </div>
     </div>
   );
 }
