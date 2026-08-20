@@ -1,90 +1,46 @@
-import { Mail, Lock } from "lucide-react";
+import { User, Mail, Lock } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { FaMicrosoft } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import auth from "../api/auth";
+import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
 import Button from "./Button";
 
-import { useState } from "react";
-import auth from "../api/auth";
-import store from "../api/store";
-
-import { useNavigate } from "react-router-dom";
-
-function LoginForm() {
+function RegisterForm() {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("Cashier");
 
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      // Login
-      const response = await auth.login({
-        email,
-        password,
-      });
+  try {
+    const response = await auth.register({
+      full_name: fullName,
+      email,
+      password,
+      role,
+    });
 
-      // Save token
-      localStorage.setItem(
-        "token",
-        response.data.token
-      );
+    alert(response.data.message);
 
-      // Save user
-      localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.user)
-      );
-
-      // Check if user already has a store
-      try {
-        await store.getStore();
-
-        // Store exists
-        navigate("/dashboard");
-
-      } catch (storeError) {
-
-        if (storeError.response?.status === 404) {
-
-          // Admin doesn't have a store yet
-          navigate("/setup");
-
-        } else {
-
-          console.error(storeError);
-
-          alert(
-            storeError.response?.data?.message ||
-            "Unable to check your store."
-          );
-        }
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      alert(
-        error.response?.data?.message ||
-        error.message ||
-        "Login failed"
-      );
-    }
-  };
-
+    navigate("/");
+  } catch (error) {
+    alert(
+      error.response?.data?.message ||
+      "Registration failed."
+    );
+  }
+};
   return (
     <div className="flex items-center justify-center bg-slate-50 px-10 py-8">
-
       <div className="w-full max-w-md">
-
         {/* Header */}
-
         <div className="mb-8">
-
           <h1 className="text-3xl font-bold text-slate-900">
             StoreMaster
           </h1>
@@ -92,29 +48,31 @@ function LoginForm() {
           <p className="mt-1 text-sm text-slate-500">
             Smart POS System
           </p>
-
         </div>
 
         {/* Welcome */}
-
         <div className="mb-6">
-
           <h2 className="text-2xl font-bold text-slate-900">
-            Welcome Back 👋
+            Create Account
           </h2>
 
           <p className="mt-2 text-slate-500">
-            Sign in to continue managing your business.
+            Register a new StoreMaster account.
           </p>
-
         </div>
 
-        {/* Form */}
-
         <form
-          className="space-y-4"
-          onSubmit={handleSubmit}
+           className="space-y-4"
+           onSubmit={handleSubmit}
         >
+          <InputField
+            label="Full Name"
+            type="text"
+            placeholder="Mary Mungai"
+            icon={User}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
 
           <InputField
             label="Email Address"
@@ -134,44 +92,37 @@ function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {/* Remember */}
-
-          <div className="flex items-center justify-between text-sm">
-
-            <label className="flex items-center gap-2 cursor-pointer">
-
-              <input
-                type="checkbox"
-                className="accent-blue-600"
-              />
-
-              <span>Remember me</span>
-
+          <div>
+            <label className="block mb-2 text-sm font-medium text-slate-700">
+              Role
             </label>
 
-            <button
-              type="button"
-              className="font-medium text-blue-600 hover:text-blue-700"
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
-              Forgot Password?
-            </button>
-
+              <option>Admin</option>
+              <option>Manager</option>
+              <option>Cashier</option>
+            </select>
           </div>
-
-          {/* Login */}
 
           <Button
             type="submit"
             variant="primary"
             fullWidth
           >
-            Sign In
+            Create Account
           </Button>
+
+          <p className="text-xs text-center text-slate-500">
+            You'll receive a verification email before accessing StoreMaster.
+          </p>
 
           {/* Divider */}
 
           <div className="flex items-center gap-3">
-
             <div className="h-px flex-1 bg-slate-200"></div>
 
             <span className="text-xs uppercase tracking-wide text-slate-400">
@@ -179,13 +130,11 @@ function LoginForm() {
             </span>
 
             <div className="h-px flex-1 bg-slate-200"></div>
-
           </div>
 
           {/* Google */}
 
           <Button
-            type="button"
             variant="outline"
             fullWidth
             leftIcon={<FcGoogle size={20} />}
@@ -196,40 +145,29 @@ function LoginForm() {
           {/* Microsoft */}
 
           <Button
-            type="button"
             variant="outline"
             fullWidth
-            leftIcon={
-              <FaMicrosoft
-                className="text-blue-600"
-                size={18}
-              />
-            }
+            leftIcon={<FaMicrosoft className="text-blue-600" size={18} />}
           >
             Continue with Microsoft
           </Button>
-
         </form>
 
         {/* Footer */}
 
         <p className="mt-6 text-center text-sm text-slate-500">
+          Already have an account?
 
-          Need help?
-
-          <button
-            type="button"
+          <Link
+            to="/"
             className="ml-1 font-medium text-blue-600 hover:text-blue-700"
           >
-            Contact your administrator
-          </button>
-
+            Sign In
+          </Link>
         </p>
-
       </div>
-
     </div>
   );
 }
 
-export default LoginForm;
+export default RegisterForm;

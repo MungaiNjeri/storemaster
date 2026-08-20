@@ -1,7 +1,7 @@
 import Sidebar from "./Sidebar";
 import Topbar from "../components/Topbar";
 
-function MainLayout() {
+function MainLayout({ children }) {
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -10,7 +10,7 @@ function MainLayout() {
         <Topbar />
 
         <main className="flex-1 bg-gray-100 p-6">
-          Main Content
+          {children}
         </main>
       </div>
     </div>

@@ -1,16 +1,14 @@
+import MainLayout from "../layouts/MainLayout";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import StatsGrid from "../components/dashboard/StatsGrid";
+
 function Dashboard() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="bg-white p-10 rounded-2xl shadow-lg text-center">
-        <h1 className="text-4xl font-bold text-slate-800">
-          🎉 Welcome to StoreMaster
-        </h1>
+    <MainLayout>
+        <DashboardHeader />
+        <StatsGrid />
 
-        <p className="mt-4 text-slate-500">
-          You have successfully logged in.
-        </p>
-      </div>
-    </div>
+    </MainLayout>
   );
 }
 

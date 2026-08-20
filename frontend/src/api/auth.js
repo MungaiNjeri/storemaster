@@ -1,7 +1,10 @@
-import axios from "axios";
+import api from "./api";
 
-const auth = axios.create({
-  baseURL: "http://127.0.0.1:5000/api/auth",
-});
+const login = (data) => api.post("/auth/login", data);
 
-export default auth;
+const register = (data) => api.post("/auth/register", data);
+
+export default {
+  login,
+  register,
+};

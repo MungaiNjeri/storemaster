@@ -1,7 +1,20 @@
 import SidebarItem from "../components/SidebarItem";
-import navigation from "../data/navigation";
+import {
+  adminNavigation,
+  managerNavigation,
+  cashierNavigation,
+} from "../data/navigation";
 
 function Sidebar() {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+let navigation = cashierNavigation;
+
+if (user?.role === "Admin") {
+  navigation = adminNavigation;
+} else if (user?.role === "Manager") {
+  navigation = managerNavigation;
+}
   return (
     <aside className="w-64 h-screen bg-blue-700 text-white flex flex-col">
 

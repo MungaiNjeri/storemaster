@@ -39,6 +39,12 @@ class User(db.Model):
         default="Active",
     )
 
+    store_id = db.Column(
+        db.Integer,
+        db.ForeignKey("stores.id"),
+        nullable=True,
+    )
+
     last_login = db.Column(
         db.DateTime,
         nullable=True,
@@ -62,8 +68,10 @@ class User(db.Model):
             "email": self.email,
             "role": self.role,
             "status": self.status,
+            "store_id": self.store_id,
             "last_login": self.last_login,
             "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }
 
     def __repr__(self):

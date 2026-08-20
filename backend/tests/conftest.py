@@ -1,57 +1,66 @@
+import pytest
+
 from flask import Flask
-from flask_cors import CORS
-from flask_jwt_extended import JWTManager
 
 from app.config.config import Config
 from app.config.database import db
 from app.services.auth_service import bcrypt
-
-from app.routes.store import store_bp
-
-
-jwt = JWTManager()
+from flask_jwt_extended import JWTManager
 
 
-def create_app():
+@pytest.fixture
+def app():
+
     app = Flask(__name__)
 
-    # Load configuration
     app.config.from_object(Config)
+
+    # Test configuration
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["JWT_SECRET_KEY"] = "test-secret-key"
 
     # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)
+
+    jwt = JWTManager()
     jwt.init_app(app)
 
-    CORS(app)
-
-    # Import routes
+    # Register routes
     from app.routes.auth import auth_bp
     from app.routes.dashboard import dashboard_bp
+    from app.routes.store import store_bp
 
-    # Register authentication routes
     app.register_blueprint(
         auth_bp,
         url_prefix="/api/auth"
     )
 
-    # Register dashboard routes
     app.register_blueprint(
         dashboard_bp,
         url_prefix="/api/dashboard"
     )
 
-    # Register store routes
     app.register_blueprint(
         store_bp,
         url_prefix="/api/stores"
     )
 
-    # Create database tables
+    # Import models
+    from app.models.user import User
+    from app.models.store import Store
+
     with app.app_context():
-        from app.models.user import User
-        from app.models.store import Store
 
         db.create_all()
 
-    return app
+        yield app
+
+        db.session.remove()
+        db.drop_all()
+
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
